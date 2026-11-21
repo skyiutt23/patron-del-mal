@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patrón del mal: cómo la web te obliga a consumir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Rubik:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --negro:#0e0e0e; --crema:#fffae0; --rosa:#ffb7e6; --rosa-f:#ee3e8a;
+  --naranja:#f9ae3a; --violeta:#5b2a9e; --verde:#4bc59e; --azul:#0d85dd;
+  --gris:#3b3b3b; --gris-m:#6e6e6e;
+  --t:'Rubik',system-ui,sans-serif; --b:'Bricolage Grotesque',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#1b1b1b}
+body{font-family:var(--b);color:#111;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+img{display:block;max-width:100%}
+.app{max-width:440px;margin:0 auto;min-height:100vh;background:var(--crema);position:relative;overflow-x:hidden}
+.screen{display:none;min-height:100vh;animation:fade .35s ease}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* --- estilos del Figma --- */
+.grid{background-color:var(--negro);background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:32px 32px}
+.titulo{font-family:var(--t);font-weight:900;line-height:1.06;letter-spacing:-.01em}
+.grad-negro{background:linear-gradient(102deg,#000 4%,#5e5e5e 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.grad-gana{background:linear-gradient(90deg,#ff7cc5,#ffb36b 70%,#ffc56b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ola{height:18px;background-repeat:repeat-x;background-size:36px 18px}
+.ola-crema-abajo{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18'%3E%3Cpath d='M0 0H36V9Q27 18 18 9T0 9Z' fill='%23fffae0'/%3E%3C/svg%3E")}
+.ola-rosa-abajo{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18'%3E%3Cpath d='M0 0H36V9Q27 18 18 9T0 9Z' fill='%23ffb7e6'/%3E%3C/svg%3E")}
+.ola-crema-arriba{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18'%3E%3Cpath d='M0 18H36V9Q27 0 18 9T0 9Z' fill='%23fffae0'/%3E%3C/svg%3E")}
+.pill{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;border-radius:100px;background:var(--rosa);font-weight:700;font-size:17px;color:#000;box-shadow:1px 1px 7px 1px rgba(59,59,59,.6);transition:transform .12s}
+.pill:active{transform:scale(.97)}
+.pill.negro{background:#111;color:var(--crema)}
+.input{width:100%;height:50px;border-radius:100px;border:1px solid var(--gris);background:var(--crema);box-shadow:0 1px 8px 1px rgba(59,59,59,.5);padding:0 20px;font:inherit;font-size:15px;color:#111;outline:none}
+.input::placeholder{color:var(--gris-m)}
+.input:focus{box-shadow:0 0 0 3px var(--rosa),0 1px 8px 1px rgba(59,59,59,.5)}
+
+/* --- inicio --- */
+#s-inicio{animation:none;padding-top:74px;background:var(--negro)}
+.hdr-fijo{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;z-index:30;pointer-events:none}
+.hdr-fijo .top{background:var(--crema);height:56px;display:flex;align-items:center;padding:0 22px;pointer-events:auto}
+.gancho{padding:34px 24px 40px;color:var(--crema)}
+.gancho .no{font-size:58px;line-height:.98}
+.gancho .pero{font-family:var(--t);font-weight:700;font-size:26px;line-height:1.12;margin:18px 0 26px}
+.gancho .pero mark{background:var(--rosa);color:#111;padding:0 6px;border-radius:6px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.gancho .pista{font-size:15px;line-height:1.3;opacity:.85;margin-bottom:22px}
+.gancho .anim{font-family:var(--t);font-weight:900;font-size:22px;margin-bottom:14px}
+.seguir{display:block;margin:16px auto 0;font-size:13px;color:var(--crema);opacity:.7}
+.hero{position:relative}
+.burger{width:26px;height:18px;display:flex;flex-direction:column;justify-content:space-between}
+.burger i{display:block;height:4px;border-radius:2px;background:#111}
+.hero img{width:100%}
+.logos{background:#fff}
+.banda{background:var(--rosa);padding:22px 22px 10px}
+.banda h2{font-size:34px}
+.ola-rosa-abajo{background-color:var(--crema)}
+.intro{background:var(--crema);padding:40px 26px 50px;text-align:center;font-size:17px;line-height:1.25}
+.intro p+p{margin-top:16px}
+.intro h3{font-size:25px;margin:34px 0 18px}
+.flecha{width:46px;height:46px;border-radius:50%;background:var(--rosa);display:grid;place-items:center;margin:0 auto 26px;box-shadow:0 3px 6px rgba(0,0,0,.2);animation:bote 1.6s infinite}
+@keyframes bote{50%{transform:translateY(6px)}}
+.aviso{font-size:13px;color:var(--gris-m);margin-top:14px}
+
+/* --- tienda --- */
+.shop-h{position:sticky;top:0;z-index:20;height:60px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.marca{font-family:var(--t);font-weight:900;font-size:24px;letter-spacing:-.02em}
+.marca b{color:var(--rosa-f)}
+.carrito-btn{position:relative;width:40px;height:40px;display:grid;place-items:center}
+.carrito-btn span{position:absolute;top:2px;right:0;background:var(--rosa-f);color:#fff;font-size:11px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.timer-bar{display:none;position:sticky;top:60px;z-index:19;background:#111;color:var(--crema);font-size:13px;font-weight:600;text-align:center;padding:8px}
+.timer-bar.on{display:block}
+.timer-bar b{color:var(--rosa);font-variant-numeric:tabular-nums}
+.early{margin:16px;border-radius:20px;padding:20px;background:#fff;border:2px solid #111;position:relative;overflow:hidden}
+.early .chico{font-size:17px;line-height:1.1}
+.early .big{font-family:var(--b);font-weight:800;font-size:64px;line-height:.9;letter-spacing:-.03em}
+.early .big small{font-size:22px;vertical-align:top;margin-left:4px}
+.early .lug{font-weight:800;font-size:12px;letter-spacing:.04em;margin:6px 0 12px;color:var(--rosa-f)}
+.cats{display:flex;gap:8px;padding:0 16px 6px;overflow-x:auto}
+.cats span{flex:none;padding:7px 14px;border-radius:100px;background:#fff;border:1px solid #ddd;font-size:13px;font-weight:600}
+.cats span:first-child{background:#111;color:#fff;border-color:#111}
+.prods{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px 30px}
+.card{background:#fff;border-radius:18px;overflow:hidden;text-align:left;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative}
+.card .img{aspect-ratio:1;display:grid;place-items:center;overflow:hidden}
+.card .img img{width:100%;height:100%;object-fit:cover}
+.card .info{padding:10px 12px 12px}
+.card h4{font-size:14px;font-weight:700;line-height:1.15}
+.card .p{font-weight:800;font-size:16px;margin-top:4px}
+.card .p s{font-weight:400;color:#999;font-size:12px;margin-left:4px}
+.tag{position:absolute;top:8px;left:8px;background:var(--rosa-f);color:#fff;font-size:11px;font-weight:800;padding:4px 8px;border-radius:8px}
+.tag.n{background:#111}
+.foot-shop{padding:20px 16px 40px;font-size:11px;color:#999;text-align:center}
+
+/* --- producto --- */
+.volver{font-size:14px;font-weight:600;padding:12px 16px}
+.p-img{margin:0 16px;border-radius:24px;overflow:hidden;aspect-ratio:1;position:relative}
+.p-img img{width:100%;height:100%;object-fit:cover}
+.viendo{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.78);color:#fff;font-size:12.5px;font-weight:600;padding:7px 11px;border-radius:100px}
+.p-body{padding:16px}
+.p-body h1{font-family:var(--t);font-weight:900;font-size:26px;line-height:1.05}
+.estrellas{font-size:13px;margin:6px 0 10px;color:#444}
+.estrellas b{color:#f5a300;letter-spacing:1px}
+.precio{display:flex;align-items:baseline;gap:8px}
+.precio .n{font-weight:800;font-size:30px}
+.precio s{color:#999}
+.precio .off{background:var(--verde);color:#fff;font-size:12px;font-weight:800;padding:3px 7px;border-radius:6px}
+.letra-chica{font-size:9.5px;color:#bbb;margin-top:2px}
+.alertas{display:flex;flex-direction:column;gap:6px;margin:14px 0}
+.alerta{font-size:13.5px;font-weight:700;padding:9px 12px;border-radius:12px}
+.alerta.stock{background:#ffe3ef;color:#c4005a}
+.alerta.dem{background:#fff1d6;color:#9a5a00}
+.lbl{font-size:13px;font-weight:700;margin:14px 0 8px}
+.tamanos{display:flex;gap:8px}
+.tam{flex:1;border:2px solid #ddd;border-radius:14px;padding:10px 4px;text-align:center;font-size:14px;font-weight:700;background:#fff}
+.tam small{display:block;font-weight:400;font-size:11.5px;color:#777;margin-top:2px}
+.tam.sel{border-color:#111;background:#111;color:#fff}
+.tam.sel small{color:#ddd}
+.tam .pop{display:block;font-size:10px;font-weight:800;color:var(--rosa-f);margin-bottom:2px}
+.tam.sel .pop{color:var(--rosa)}
+.combo{display:flex;gap:12px;align-items:center;background:#fff;border-radius:16px;padding:10px 12px;margin-top:14px;border:2px solid var(--rosa)}
+.combo img{width:54px;height:54px;border-radius:12px;object-fit:cover}
+.combo div{flex:1;font-size:13px;line-height:1.2}
+.combo b{display:block;font-size:14px}
+.chk{width:24px;height:24px;flex:none;border-radius:7px;border:2px solid #111;display:grid;place-items:center;background:#fff}
+.chk.on{background:#111}
+.chk.on::after{content:"";width:11px;height:6px;border:solid #fff;border-width:0 0 3px 3px;transform:rotate(-45deg) translate(1px,-1px)}
+.sticky-buy{position:sticky;bottom:0;padding:12px 16px 16px;background:linear-gradient(transparent,var(--crema) 30%)}
+.resenas{padding:6px 16px 120px}
+.resenas h3{font-family:var(--t);font-weight:900;font-size:20px;margin-bottom:10px}
+.res{background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:8px;font-size:14px;line-height:1.3}
+.res .q{font-weight:700;font-size:13px;margin-bottom:4px}
+.res .q b{color:#f5a300}
+
+/* --- carrito / checkout --- */
+.pag{padding:4px 16px 120px}
+.pag h1{font-family:var(--t);font-weight:900;font-size:28px;margin:6px 0 14px}
+.item{display:flex;gap:12px;background:#fff;border-radius:18px;padding:10px;margin-bottom:10px;align-items:center}
+.item img{width:70px;height:70px;border-radius:12px;object-fit:cover}
+.item div{flex:1;font-size:13px;line-height:1.25}
+.item b{display:block;font-size:14.5px}
+.item .pr{font-weight:800;font-size:15px;white-space:nowrap}
+.quitar{font-size:11px;color:#b5b5b5;text-decoration:underline;margin-top:4px}
+.regalo{font-size:11px;font-weight:800;color:var(--verde)}
+.resumen{background:#fff;border-radius:18px;padding:14px 16px;margin:14px 0;font-size:14px}
+.resumen .f{display:flex;justify-content:space-between;padding:4px 0}
+.resumen .f.tot{border-top:1px solid #eee;margin-top:6px;padding-top:10px;font-weight:800;font-size:18px}
+.resumen .f.nuevo{color:#b8004f;animation:fade .5s}
+.verde{color:#198a64;font-weight:700}
+.campo{margin-bottom:10px}
+.club{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;padding:12px;margin:12px 0}
+.club div{font-size:13px;line-height:1.25}
+.club b{font-size:14.5px}
+.club small{display:block;font-size:9.5px;color:#bbb;margin-top:4px}
+.paso{display:flex;gap:6px;margin:4px 0 14px}
+.paso i{flex:1;height:5px;border-radius:3px;background:#e2dccb}
+.paso i.on{background:#111}
+.cargando{min-height:100vh;display:none;place-items:center;text-align:center;padding:30px}
+.cargando.on{display:grid}
+.spin{width:54px;height:54px;border-radius:50%;border:6px solid var(--rosa);border-top-color:#111;animation:gira 1s linear infinite;margin:0 auto 16px}
+@keyframes gira{to{transform:rotate(360deg)}}
+
+/* --- modales --- */
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(20,20,20,.72)}
+.modal.on{display:flex;animation:fade .3s}
+.caja{width:100%;max-width:400px;background:var(--crema);border-radius:28px;padding:24px 20px 20px;position:relative;max-height:92vh;overflow:auto}
+.caja h2{font-size:30px;margin-bottom:10px}
+.caja .txt{font-weight:700;font-size:14px;color:#323232;line-height:1.2;margin-bottom:16px}
+.fila{display:flex;gap:10px;margin:12px 0}
+.tel{display:flex;align-items:center;padding:0 0 0 14px;gap:8px}
+.tel span{font-size:14px;border-right:1px solid var(--gris);padding-right:8px;white-space:nowrap}
+.tel input{border:0;background:none;outline:none;font:inherit;font-size:15px;width:100%;min-width:0}
+.consent{display:flex;gap:8px;align-items:flex-start;font-size:9px;color:var(--gris-m);line-height:1.2;margin:4px 0 16px}
+.consent .chk{width:16px;height:16px;border-radius:5px;border-width:1px;border-color:var(--gris)}
+.consent .chk.on{background:#7e7e7e}
+.consent .chk.on::after{width:7px;height:4px;border-width:0 0 2px 2px}
+.consent u{font-weight:700}
+.nogracias{display:block;margin:12px auto 0;font-size:10px;color:#cfc9b2}
+.cerrar-x{position:absolute;top:10px;right:14px;font-size:12px;color:#e6e0c8}
+
+/* ruleta */
+.caja.oscura{background:transparent;padding:0;text-align:center;color:#fff}
+.ruleta-wrap{background:var(--negro);border-radius:28px;padding:22px 16px 20px;overflow:hidden}
+.ruleta-wrap .titulo{font-size:44px;text-align:left}
+.ruleta-wrap .titulo.gana{font-size:84px;margin-top:-4px}
+.ruleta{position:relative;width:270px;height:270px;margin:16px auto 18px}
+.ruleta svg{width:100%;height:100%;filter:drop-shadow(0 0 22px rgba(238,62,138,.55));transition:transform 4.2s cubic-bezier(.12,.75,.12,1)}
+.ruleta .aguja{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid var(--crema);z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+.premio{display:none}
+.premio.on{display:block;animation:fade .4s}
+.premio .cupon{background:var(--crema);color:#111;border-radius:20px;padding:16px;margin-bottom:12px;border:3px dashed var(--rosa-f)}
+.premio .cupon b{font-family:var(--t);font-weight:900;font-size:40px;display:block}
+.premio .reloj{font-variant-numeric:tabular-nums;font-weight:800;color:var(--rosa)}
+.mas-tarde{display:block;margin:12px auto 0;font-size:11px;color:#777}
+
+/* confirmshaming */
+.caja.chica{text-align:center}
+.caja.chica .emo{font-size:44px}
+.caja.chica h2{font-size:24px;margin:6px 0}
+.shame{display:block;margin:14px auto 0;font-size:12px;color:#aaa;text-decoration:underline}
+
+/* --- revelación --- */
+.rev-top{padding:0 22px 28px;color:var(--crema)}
+.rev-top .eyebrow{font-size:14px;font-weight:700;color:var(--rosa);padding-top:30px}
+.rev-top h1{font-size:46px;margin:8px 0 12px}
+.rev-top h1 .num{font-size:100px;display:block;line-height:.9}
+.rev-top p{font-size:16px;line-height:1.3;opacity:.92}
+.medidor{height:14px;border-radius:7px;background:#333;overflow:hidden;margin-top:18px}
+.medidor i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff7cc5,#ffc56b);transition:width 1.4s ease}
+.leyenda{display:flex;gap:14px;font-size:12px;margin-top:10px;opacity:.85}
+.leyenda span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.leyenda .a::before{background:var(--rosa-f)}
+.leyenda .b::before{background:var(--verde)}
+.pats{padding:26px 16px 10px}
+.pats h2{font-size:28px;padding:0 4px;margin-bottom:6px}
+.pats .sub{font-size:14px;padding:0 4px;margin-bottom:16px;color:#444}
+.pat{background:#fff;border-radius:22px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.pat summary{list-style:none;display:flex;gap:12px;align-items:center;padding:14px;cursor:pointer}
+.pat summary::-webkit-details-marker{display:none}
+.pat .nro{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;font-family:var(--t);font-weight:900;font-size:16px;background:#f1ecd6}
+.pat.cayo .nro{background:var(--rosa-f);color:#fff}
+.pat.esq .nro{background:var(--verde);color:#fff}
+.pat .nom{flex:1;font-weight:800;font-size:15.5px;line-height:1.15}
+.pat .nom small{display:block;font-weight:600;font-size:11.5px;color:#888;margin-top:2px}
+.pat .chip{font-size:11px;font-weight:800;padding:4px 9px;border-radius:100px;white-space:nowrap}
+.pat.cayo .chip{background:#ffe3ef;color:#c4005a}
+.pat.esq .chip{background:#dcf5ec;color:#137455}
+.pat .det{padding:0 16px 16px;font-size:14px;line-height:1.35}
+.pat .det p{margin-bottom:10px}
+.pat .dato{display:flex;gap:10px;align-items:center;background:var(--crema);border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.pat .dato b{font-family:var(--t);font-weight:900;font-size:24px;white-space:nowrap}
+.pat .dato span{font-size:12.5px;line-height:1.2}
+.pat .tip{background:#111;color:var(--crema);border-radius:14px;padding:11px 13px;font-size:13.5px}
+.pat .tip b{color:var(--rosa)}
+.consejos{margin:20px 16px;background:var(--rosa);border-radius:26px;padding:22px 20px}
+.consejos h2{font-size:28px;margin-bottom:12px}
+.consejos ol{padding-left:20px;font-size:15px;line-height:1.35}
+.consejos li{margin-bottom:8px}
+.cierre{padding:10px 16px 30px;text-align:center}
+.cierre p{font-size:13px;color:#555;margin:14px 6px}
+.fuente{font-size:11px;color:#777;padding:0 22px 26px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- ============ INICIO ============ -->
+<section class="screen on" id="s-inicio">
+  <div class="hdr-fijo"><div class="top"><div class="burger" aria-hidden="true"><i></i><i></i><i></i></div></div><div class="ola ola-crema-abajo"></div></div>
+  <div class="gancho grid">
+    <h1 class="titulo no grad-gana" id="g-no">No hay cupón.</h1>
+    <p class="pero">Pero acabás de caer en una trampa que usan <mark>9 de cada 10</mark> tiendas online.</p>
+    <p class="pista" id="g-pista">Te prometimos un premio para que escanearas el QR. Las tiendas online hacen lo mismo todos los días, y casi nunca te das cuenta.</p>
+    <p class="anim">¿Te animás a ver en cuántas más caés?</p>
+    <button class="pill" onclick="entrarTienda()">Sí, quiero probar &gt;</button>
+    <button class="seguir" onclick="document.querySelector('.hero').scrollIntoView({behavior:'smooth'})">o seguí leyendo ↓</button>
+  </div>
+  <div class="hero grid">
+    <img src="img/hero.jpg" alt="Una mano titiritera controla un cerebro dentro de una cabeza violeta.">
+    <h2 class="sr">Como la web te obliga a consumir. Qué son los patrones oscuros, y cómo están diseñados para influenciar las compras que hacemos por internet.</h2>
+  </div>
+  <img class="logos" src="img/logos.jpg" alt="AGESIC, Facultad de Arquitectura, Diseño y Urbanismo (UdelaR) y Unidad Defensa del Consumidor (MEF)">
+  <div class="banda"><h2 class="titulo grad-negro">La arquitectura detrás de nuestras decisiones.</h2></div>
+  <div class="ola ola-rosa-abajo"></div>
+  <div class="intro">
+    <p>En 2025, la Unidad Defensa del Consumidor (UDECO) relevó 77 tiendas online de Uruguay y confirmó que casi todas usan patrones oscuros:</p>
+    <p>Trampas visuales y psicológicas para manipularte y hacerte tomar decisiones impidiendo que elijas con total libertad.</p>
+    <h3 class="titulo grad-negro">¿Te darías cuenta?</h3>
+    <p>Entrá a esta tienda y comprá algo como lo harías siempre. Al final te mostramos en qué trampas caíste.</p>
+    <div class="flecha" style="margin-top:26px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M5 12l7 7 7-7"/></svg></div>
+    <button class="pill" onclick="entrarTienda()">Entrar a la tienda &gt;</button>
+    <p class="aviso">Es una tienda simulada. No se guarda ningún dato ni se cobra nada.</p>
+  </div>
+</section>
+
+<!-- ============ TIENDA ============ -->
+<section class="screen" id="s-tienda">
+  <header class="shop-h">
+    <div class="marca">glow<b>y</b></div>
+    <button class="carrito-btn" onclick="irCarrito()" aria-label="Carrito"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg><span class="cnt">0</span></button>
+  </header>
+  <div class="timer-bar">Tu 25% OFF vence en <b class="reloj">10:00</b></div>
+  <div class="early">
+    <div class="chico">Anotate al early access</div>
+    <div class="chico" style="font-weight:800;font-size:24px;margin-top:2px">y obtené un</div>
+    <div class="big">50%<small>OFF</small></div>
+    <div class="lug">⚠ SOLO QUEDAN <span id="lugares">7</span> LUGARES</div>
+    <button class="pill negro" onclick="earlyAccess(this)" style="min-height:44px;font-size:15px">Quiero mi lugar</button>
+  </div>
+  <div class="cats"><span>Todo</span><span>Skincare</span><span>Maquillaje</span><span>Kits</span><span>Ofertas</span></div>
+  <div class="prods" id="prods"></div>
+  <div class="foot-shop">glowy © 2026 · Precios sujetos a cambios sin previo aviso.</div>
+</section>
+
+<!-- ============ PRODUCTO ============ -->
+<section class="screen" id="s-producto">
+  <header class="shop-h">
+    <div class="marca">glow<b>y</b></div>
+    <button class="carrito-btn" onclick="irCarrito()" aria-label="Carrito"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg><span class="cnt">0</span></button>
+  </header>
+  <div class="timer-bar">Tu 25% OFF vence en <b class="reloj">10:00</b></div>
+  <button class="volver" onclick="ir('s-tienda')">‹ Volver</button>
+  <div class="p-img"><img id="p-img" src="" alt=""><div class="viendo">👀 <span id="viendo">23</span> personas están viendo esto ahora</div></div>
+  <div class="p-body">
+    <h1 id="p-nom"></h1>
+    <div class="estrellas"><b>★★★★★</b> 4,9 · 1.284 reseñas</div>
+    <div class="precio"><span class="n" id="p-precio"></span><s id="p-antes"></s><span class="off">-40%</span></div>
+    <div class="letra-chica">Imp. no incluidos. Precio sujeto a disponibilidad.</div>
+    <div class="alertas">
+      <div class="alerta stock">🔥 ¡Últimas <span id="stock">2</span> unidades!</div>
+      <div class="alerta dem">📈 87 personas lo compraron en las últimas 24 h. Se está agotando.</div>
+    </div>
+    <div class="lbl">Tamaño</div>
+    <div class="tamanos" id="tamanos"></div>
+    <div class="combo" onclick="toggleCombo()">
+      <img src="img/labial.jpg" alt="">
+      <div><b>Completá tu rutina</b>Sumá el bálsamo labial Glow por solo <span id="combo-p"></span> más</div>
+      <span class="chk on" id="combo-chk"></span>
+    </div>
+  </div>
+  <div class="sticky-buy"><button class="pill" onclick="agregar()">Agregar al carrito · <span id="btn-total"></span></button></div>
+  <div class="resenas">
+    <h3>Lo que dicen nuestras clientas</h3>
+    <div class="res"><div class="q"><b>★★★★★</b> Sofi</div>¡Lo amo! Me cambió la piel en una semana, lo recomiendo 100%.</div>
+    <div class="res"><div class="q"><b>★★★★★</b> M.</div>El mejor producto que probé en mi vida. Compré tres.</div>
+    <div class="res"><div class="q"><b>★★★★★</b> Cliente verificada</div>Increíble, llegó rapidísimo. Volvería a comprar mil veces.</div>
+  </div>
+</section>
+
+<!-- ============ CARRITO ============ -->
+<section class="screen" id="s-carrito">
+  <header class="shop-h"><div class="marca">glow<b>y</b></div><span></span></header>
+  <div class="timer-bar">Tu 25% OFF vence en <b class="reloj">10:00</b></div>
+  <button class="volver" onclick="ir('s-tienda')">‹ Seguir comprando</button>
+  <div class="pag">
+    <h1>Tu carrito</h1>
+    <div id="items"></div>
+    <div class="resumen" id="res-carrito"></div>
+    <button class="pill" onclick="irCheckout()">Finalizar compra &gt;</button>
+  </div>
+</section>
+
+<!-- ============ CHECKOUT ============ -->
+<section class="screen" id="s-checkout">
+  <header class="shop-h"><div class="marca">glow<b>y</b></div><span style="font-size:12px;color:#888">🔒 Pago seguro</span></header>
+  <div class="timer-bar">Tu 25% OFF vence en <b class="reloj">10:00</b></div>
+  <div class="pag">
+    <div class="paso"><i class="on"></i><i class="on" id="paso2"></i><i id="paso3"></i></div>
+    <div id="co-1">
+      <h1>Envío</h1>
+      <div class="campo"><input class="input" id="co-nombre" placeholder="Nombre y apellido"></div>
+      <div class="campo"><input class="input" placeholder="Dirección"></div>
+      <div class="campo"><input class="input" placeholder="Departamento" value="Montevideo"></div>
+      <div class="club" onclick="toggleClub()">
+        <span class="chk on" id="club-chk"></span>
+        <div><b>Probá Club Glow GRATIS ✨</b><br>Envíos gratis y regalos exclusivos en tu primera compra.<small>Prueba de 30 días. Luego se renueva automáticamente por $ 490/mes hasta que la canceles desde tu cuenta.</small></div>
+      </div>
+      <div class="resumen" id="res-co1"></div>
+      <button class="pill" onclick="checkoutPaso2()">Continuar al pago &gt;</button>
+    </div>
+    <div id="co-2" style="display:none">
+      <h1>Pago</h1>
+      <div class="campo"><input class="input" placeholder="Número de tarjeta" inputmode="numeric"></div>
+      <div class="fila"><input class="input" placeholder="MM/AA"><input class="input" placeholder="CVV"></div>
+      <div class="resumen" id="res-co2"></div>
+      <button class="pill" onclick="pagar()">Pagar ahora</button>
+      <button class="volver" style="display:block;margin:10px auto 0;color:#888" onclick="abandonar()">Cancelar compra</button>
+    </div>
+  </div>
+</section>
+
+<div class="cargando" id="cargando"><div><div class="spin"></div><b>Procesando tu pago…</b></div></div>
+
+<!-- ============ REVELACIÓN ============ -->
+<section class="screen" id="s-final">
+  <div class="grid">
+    <div style="background:var(--crema);height:20px"></div><div class="ola ola-crema-abajo"></div>
+    <div class="rev-top">
+      <div class="eyebrow" id="rev-eyebrow">¡Compra realizada! O eso parecía…</div>
+      <h1 class="titulo"><span class="num grad-gana" id="rev-num">0</span><span class="grad-gana">de 12 trampas</span></h1>
+      <p id="rev-txt"></p>
+      <div class="medidor"><i id="medidor"></i></div>
+      <div class="leyenda"><span class="a">Caíste</span><span class="b">Lo esquivaste</span></div>
+    </div>
+    <div class="ola ola-crema-arriba"></div>
+  </div>
+  <div class="pats">
+    <h2 class="titulo grad-negro">Los 12 patrones oscuros</h2>
+    <p class="sub">Ordenados de más a menos frecuentes en las tiendas online de Uruguay. Tocá cada uno para ver qué pasó.</p>
+    <div id="lista"></div>
+  </div>
+  <div class="consejos">
+    <h2 class="titulo">Antes de comprar, pará y fijate</h2>
+    <ol>
+      <li><b>Ningún reloj te apura.</b> Si la oferta es real, mañana sigue.</li>
+      <li><b>Mirá cada casilla.</b> Lo que viene marcado casi nunca te conviene a vos.</li>
+      <li><b>Revisá el carrito</b> antes de pagar: ¿está solo lo que elegiste?</li>
+      <li><b>Buscá el total final</b> con envío y cargos antes de dar tus datos.</li>
+      <li><b>Desconfiá de lo que no se puede verificar:</b> "quedan 2", "23 viendo", reseñas sin nombre.</li>
+      <li><b>Si te sentís presionado o culpable</b> por decir que no, es una señal de manipulación.</li>
+    </ol>
+  </div>
+  <div class="cierre">
+    <p>¿Viste una tienda que usa estas trampas? Podés hacer tu consulta o denuncia en la Unidad Defensa del Consumidor (UDECO).</p>
+    <button class="pill" onclick="location.reload()">Volver a empezar</button>
+  </div>
+  <img class="logos" src="img/logos.jpg" alt="AGESIC, FADU UdelaR y Unidad Defensa del Consumidor">
+  <p class="fuente" style="padding-top:16px">Datos: UDECO (MEF), "Patrones oscuros en el comercio electrónico", relevamiento de 77 tiendas online, 2025.</p>
+</section>
+</div>
+
+<!-- ============ MODALES ============ -->
+<div class="modal" id="m-registro" role="dialog" aria-modal="true" aria-labelledby="reg-t">
+  <div class="caja">
+    <button class="cerrar-x" onclick="cerrarRegistro(true)" aria-label="Cerrar">✕</button>
+    <h2 class="titulo grad-negro" id="reg-t">Ingresá tus datos para continuar</h2>
+    <p class="txt">Sumate a glowy y desbloqueá un regalo sorpresa en tu primera compra 🎁</p>
+    <form onsubmit="enviarRegistro(event)" novalidate>
+      <input class="input" id="reg-email" type="email" placeholder="Email">
+      <div class="fila">
+        <label class="input tel" style="flex:1.1"><span>UY +598</span><input placeholder="Celular" inputmode="tel" id="reg-cel"></label>
+        <input class="input" style="flex:1" placeholder="Nombre" id="reg-nombre">
+      </div>
+      <div class="consent" onclick="toggleConsent()"><span class="chk on" id="consent-chk"></span><span>Al dar tu información, das consentimiento para que tu información sea guardada y compartida con socios comerciales de acuerdo a nuestra <u>política de privacidad</u>.</span></div>
+      <button class="pill" type="submit">Continuar &gt;</button>
+    </form>
+    <button class="nogracias" onclick="cerrarRegistro(true)">no gracias, prefiero pagar precio completo</button>
+  </div>
+</div>
+
+<div class="modal" id="m-ruleta" role="dialog" aria-modal="true" aria-label="Ruleta de premios">
+  <div class="caja oscura">
+    <div class="ruleta-wrap grid">
+      <div class="titulo" style="color:var(--crema)">Girá y</div>
+      <div class="titulo gana grad-gana">GANÁ</div>
+      <div class="ruleta"><div class="aguja"></div><svg id="rueda" viewBox="-110 -110 220 220" aria-hidden="true"></svg></div>
+      <div id="pre-giro"><button class="pill" onclick="girar()">¡Girar!</button></div>
+      <div class="premio" id="premio">
+        <div class="cupon">¡Ganaste!<b>25% OFF</b>en toda la tienda</div>
+        <p style="font-size:14px;margin-bottom:12px">Válido solo por <span class="reloj">10:00</span> minutos</p>
+        <button class="pill" onclick="usarCupon(true)">Usarlo ahora</button>
+        <button class="mas-tarde" onclick="usarCupon(false)">Lo uso más tarde</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="m-quitar" role="dialog" aria-modal="true" aria-labelledby="q-t">
+  <div class="caja chica">
+    <div class="emo">🥺</div>
+    <h2 class="titulo" id="q-t">¿Seguro que querés quitar tu regalo?</h2>
+    <p style="font-size:14px">El 92% de nuestras clientas lo suma a su compra. Tu piel te lo va a agradecer.</p>
+    <button class="pill" style="margin-top:16px" onclick="cerrarModal('m-quitar')">¡Me lo quedo! 💖</button>
+    <button class="shame" onclick="quitarColado()">No, prefiero descuidar mi piel</button>
+  </div>
+</div>
+
+<div class="modal" id="m-abandono" role="dialog" aria-modal="true">
+  <div class="caja chica">
+    <div class="emo">😢</div>
+    <h2 class="titulo">¿Te vas sin tu descuento?</h2>
+    <p style="font-size:14px">Tu 25% OFF y tus productos se pierden para siempre.</p>
+    <button class="pill" style="margin-top:16px" onclick="cerrarModal('m-abandono')">Seguir con mi compra</button>
+    <button class="shame" onclick="cerrarModal('m-abandono');terminar(true)">Sí, quiero pagar más otro día</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Datos ---------- */
+const PRODUCTOS=[
+  {id:'crema',nom:'Crema Hidratante Glow',img:'img/crema.jpg',precio:1290,tag:'Más vendido'},
+  {id:'compacto',nom:'Polvo Compacto Soft Matte',img:'img/compacto.jpg',precio:990,tag:'-40%'},
+  {id:'pote',nom:'Mascarilla Nocturna Lilac',img:'img/pote.jpg',precio:1150,tag:'¡Últimas!'},
+  {id:'labial',nom:'Labial Rosé Velvet',img:'img/labial.jpg',precio:690,tag:'Nuevo'}
+];
+const TAMANOS=[{n:'30 ml',f:.6},{n:'50 ml',f:1},{n:'100 ml',f:1.7,pop:'⭐ Más elegido'}];
+const COMBO=390, COLADO={nom:'Mini sérum iluminador',img:'img/cosmeticos.jpg',precio:420};
+const CARGOS=[['Envío',290],['Gestión online',149],['Embalaje sustentable',99]];
+
+/* Lo que hizo la persona: true = cayó, false = lo esquivó */
+const R={};
+let prod=null, tam=2, combo=true, cupon=false, carrito=[], colado=true, consent=true, club=true, timerFin=null, timerInt=null, registroHecho=false;
+
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const fmt=n=>'$ '+Math.round(n).toLocaleString('es-UY');
+function ir(id){$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+function abrirModal(id){$('#'+id).classList.add('on')}
+function cerrarModal(id){$('#'+id).classList.remove('on')}
+
+/* ---------- Tienda ---------- */
+function pintarTienda(){
+  $('#prods').innerHTML=PRODUCTOS.map(p=>`<button class="card" onclick="verProducto('${p.id}')">
+    <span class="tag ${p.tag==='Nuevo'?'n':''}">${p.tag}</span>
+    <div class="img"><img src="${p.img}" alt=""></div>
+    <div class="info"><h4>${p.nom}</h4><div class="p">${fmt(p.precio)}<s>${fmt(p.precio/.6)}</s></div></div></button>`).join('');
+}
+/* Canal de entrada por hash: #cantina #trago #meta #shopping */
+const CANAL=(location.hash||'').slice(1).toLowerCase();
+const GANCHOS={
+  cantina:['No hay cupón para la cantina.','Te prometimos un cupón para que escanearas el QR. Las tiendas online hacen lo mismo todos los días, y casi nunca te das cuenta.'],
+  trago:['No hay trago gratis.','Te prometimos un trago para que escanearas el QR. Las tiendas online hacen lo mismo todos los días, y casi nunca te das cuenta.'],
+  meta:['No hay cupón.','Te prometimos un premio para que tocaras el anuncio. Las tiendas online hacen lo mismo todos los días, y casi nunca te das cuenta.']
+};
+if(GANCHOS[CANAL]){document.getElementById('g-no').textContent=GANCHOS[CANAL][0];document.getElementById('g-pista').textContent=GANCHOS[CANAL][1]}
+let ruletaPrimero=false;
+function entrarTienda(){ir('s-tienda');setTimeout(()=>{if(!registroHecho)abrirModal(ruletaPrimero?'m-ruleta':'m-registro')},ruletaPrimero?500:1200)}
+function earlyAccess(b){b.textContent='¡Listo! Te avisamos por mail 💌';b.disabled=true;R.early=true}
+let lug=7;setInterval(()=>{if(lug>2&&Math.random()<.3){lug--;const l=$('#lugares');if(l)l.textContent=lug}},6000);
+
+/* ---------- Registro forzoso ---------- */
+function toggleConsent(){consent=!consent;$('#consent-chk').classList.toggle('on',consent)}
+function enviarRegistro(e){
+  e.preventDefault();
+  R.registro=true; R.consent=consent; R.visual=true;
+  const n=$('#reg-nombre').value.trim(); if(n)$('#co-nombre').value=n;
+  cerrarRegistro(false);
+}
+function cerrarRegistro(salteo){
+  registroHecho=true; cerrarModal('m-registro');
+  if(salteo){R.registro=false;R.consent=false;R.visual=false}
+  if(!ruletaPrimero)setTimeout(()=>abrirModal('m-ruleta'),500);
+}
+
+/* ---------- Ruleta (siempre sale 25% OFF) ---------- */
+const SEG=[['25% OFF','#f9ae3a'],['Envío gratis','#4bc59e'],['Kit glow','#ee3e8a'],['10% OFF','#0d85dd'],['Regalo','#f9ae3a'],['50% OFF','#4bc59e'],['Seguí intentando','#ee3e8a'],['15% OFF','#0d85dd']];
+(function pintarRueda(){
+  const n=SEG.length,r=100;let h=`<circle r="108" fill="#5b2a9e"/>`;
+  SEG.forEach((s,i)=>{const a0=(i/n)*2*Math.PI-Math.PI/2-Math.PI/n,a1=a0+2*Math.PI/n;
+    h+=`<path d="M0 0L${r*Math.cos(a0)} ${r*Math.sin(a0)}A${r} ${r} 0 0 1 ${r*Math.cos(a1)} ${r*Math.sin(a1)}Z" fill="${s[1]}"/>`;
+    const am=(a0+a1)/2*180/Math.PI;
+    h+=`<text transform="rotate(${am}) translate(58 0)" fill="#fff" font-family="Bricolage Grotesque" font-weight="800" font-size="${s[0].length>10?8.5:11}" text-anchor="middle" dominant-baseline="middle">${s[0]}</text>`;});
+  h+=`<circle r="17" fill="#ffb7e6" stroke="#fff" stroke-width="3" stroke-dasharray="2 2"/><circle r="9" fill="#fff"/>`;
+  $('#rueda').innerHTML=h;
+})();
+function girar(){
+  $('#pre-giro').style.visibility='hidden';
+  $('#rueda').style.transform=`rotate(${360*6}deg)`; /* el segmento 0 (25% OFF) siempre queda arriba */
+  setTimeout(()=>{$('#pre-giro').style.display='none';$('#premio').classList.add('on');arrancarTimer()},4300);
+}
+function usarCupon(ahora){cupon=true;R.timer=ahora;cerrarModal('m-ruleta');if(ruletaPrimero&&!registroHecho){$('#reg-t').textContent='Ingresá tus datos para reclamar tu premio';setTimeout(()=>abrirModal('m-registro'),400)}}
+function arrancarTimer(){
+  if(timerInt)return; timerFin=Date.now()+10*60*1000;
+  $$('.timer-bar').forEach(t=>t.classList.add('on'));
+  const tick=()=>{let s=Math.max(0,Math.round((timerFin-Date.now())/1000));
+    if(s===0){timerFin=Date.now()+10*60*1000;s=600} /* "vence" y se reinicia: era falso */
+    const t=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    $$('.reloj').forEach(e=>e.textContent=t)};
+  tick(); timerInt=setInterval(tick,1000);
+}
+
+/* ---------- Producto ---------- */
+let viendoInt;
+function verProducto(id){
+  prod=PRODUCTOS.find(p=>p.id===id); tam=2; combo=true;
+  $('#p-img').src=prod.img; $('#p-nom').textContent=prod.nom;
+  $('#combo-p').textContent=fmt(COMBO); $('#combo-chk').classList.add('on');
+  pintarTamanos(); ir('s-producto');
+  clearInterval(viendoInt); let v=19+Math.floor(Math.random()*9); $('#viendo').textContent=v;
+  viendoInt=setInterval(()=>{v+=Math.random()<.6?1:-1;$('#viendo').textContent=v},2500);
+}
+function precioActual(){return prod.precio*TAMANOS[tam].f}
+function pintarTamanos(){
+  $('#tamanos').innerHTML=TAMANOS.map((t,i)=>`<button class="tam ${i===tam?'sel':''}" onclick="elegirTam(${i})">${t.pop?`<span class="pop">${t.pop}</span>`:''}${t.n}<small>${fmt(prod.precio*t.f)}</small></button>`).join('');
+  $('#p-precio').textContent=fmt(precioActual()); $('#p-antes').textContent=fmt(precioActual()/.6);
+  $('#btn-total').textContent=fmt(precioActual()+(combo?COMBO:0));
+}
+function elegirTam(i){tam=i;pintarTamanos()}
+function toggleCombo(){combo=!combo;$('#combo-chk').classList.toggle('on',combo);pintarTamanos()}
+function agregar(){
+  R.presion=(tam===2)||combo; R.social=true;
+  carrito.push({nom:prod.nom+' · '+TAMANOS[tam].n,img:prod.img,precio:precioActual()});
+  if(combo)carrito.push({nom:'Bálsamo labial Glow',img:'img/labial.jpg',precio:COMBO});
+  clearInterval(viendoInt); actualizarCnt(); irCarrito();
+}
+function actualizarCnt(){const n=carrito.length+(carrito.length&&colado?1:0);$$('.cnt').forEach(c=>c.textContent=n)}
+
+/* ---------- Carrito (colarse en la cesta) ---------- */
+function irCarrito(){
+  if(!carrito.length){ir('s-tienda');return}
+  const it=carrito.map(i=>`<div class="item"><img src="${i.img}" alt=""><div><b>${i.nom}</b>Cantidad: 1</div><span class="pr">${fmt(i.precio)}</span></div>`).join('');
+  const col=colado?`<div class="item"><img src="${COLADO.img}" alt=""><div><span class="regalo">🎁 AGREGADO PARA VOS</span><b>${COLADO.nom}</b>Cantidad: 1<br><button class="quitar" onclick="abrirModal('m-quitar')">quitar</button></div><span class="pr">${fmt(COLADO.precio)}</span></div>`:'';
+  $('#items').innerHTML=it+col;
+  $('#res-carrito').innerHTML=filas(false);
+  actualizarCnt(); ir('s-carrito');
+}
+function quitarColado(){colado=false;cerrarModal('m-quitar');irCarrito()}
+function subtotal(){return carrito.reduce((a,i)=>a+i.precio,0)+(colado?COLADO.precio:0)}
+function filas(conCargos){
+  const sub=subtotal(), desc=cupon?sub*.25:0;
+  let h=`<div class="f"><span>Subtotal</span><span>${fmt(sub)}</span></div>`;
+  if(cupon)h+=`<div class="f verde"><span>Cupón ruleta 25% OFF</span><span>- ${fmt(desc)}</span></div>`;
+  let tot=sub-desc;
+  if(conCargos){CARGOS.forEach(c=>{h+=`<div class="f nuevo"><span>${c[0]}</span><span>${fmt(c[1])}</span></div>`;tot+=c[1]})}
+  else h+=`<div class="f"><span>Envío</span><span class="verde">Calculado al final</span></div>`;
+  h+=`<div class="f tot"><span>Total</span><span>${fmt(tot)}</span></div>`;
+  if(conCargos)h+=`<div style="font-size:9.5px;color:#bbb;margin-top:6px">Los precios pueden expresarse en dólares estadounidenses según el producto. Tipo de cambio del día de facturación.</div>`;
+  return h;
+}
+
+/* ---------- Checkout (costos escondidos + suscripción escondida) ---------- */
+function irCheckout(){$('#res-co1').innerHTML=filas(false);$('#co-1').style.display='';$('#co-2').style.display='none';$('#paso3').classList.remove('on');ir('s-checkout')}
+function toggleClub(){club=!club;$('#club-chk').classList.toggle('on',club)}
+function checkoutPaso2(){$('#co-1').style.display='none';$('#co-2').style.display='';$('#paso3').classList.add('on');$('#res-co2').innerHTML=filas(true);window.scrollTo(0,0)}
+function abandonar(){abrirModal('m-abandono')}
+function pagar(){terminar(false)}
+function terminar(abandono){
+  R.colado=colado; R.costos=!abandono; R.club=club&&!abandono; R.info=!abandono; R.abandono=abandono;
+  $('#cargando').classList.add('on'); $$('.screen').forEach(s=>s.classList.remove('on'));
+  setTimeout(()=>{$('#cargando').classList.remove('on');revelar()},1800);
+}
+
+/* ---------- Revelación ---------- */
+const PATRONES=[
+ {n:'Inscripción y/o suscripción forzosa',cat:'Acciones forzadas · 7.1',pct:'94,8%',
+  cayo:()=>R.registro!==false&&R.consent!==false,
+  si:'Para "continuar" te pidieron mail, celular y nombre, y la casilla para compartir tus datos con "socios comerciales" ya venía marcada.',
+  no:'Saliste del pop-up sin dar tus datos, o destildaste la casilla de consentimiento. ¡Bien!',
+  tip:'Una tienda no necesita tu celular para mostrarte productos. Buscá la opción de seguir como invitado y destildá todo lo que venga marcado.'},
+ {n:'Interferencia visual',cat:'Distracción · 3.1',pct:'92,2%',
+  cayo:()=>R.visual!==false,
+  si:'El botón "Continuar" era grande y rosa. La opción de no dar tus datos era un texto chiquito y casi invisible, y la ✕ para cerrar apenas se veía.',
+  no:'Encontraste la salida escondida del pop-up aunque estaba diseñada para que no la vieras.',
+  tip:'Cuando un botón grita y el otro susurra, frená. Buscá la opción "chiquita": suele ser la que te conviene.'},
+ {n:'Presión de compra',cat:'Distracción · 3.2',pct:'58,4%',
+  cayo:()=>R.presion===true,
+  si:'El tamaño más caro venía seleccionado como "Más elegido" y el combo con el bálsamo labial ya estaba marcado.',
+  no:'Cambiaste el tamaño preseleccionado o sacaste el combo sugerido.',
+  tip:'Revisá qué opción viene marcada por defecto. "Más elegido" o "recomendado" no significa que sea lo mejor para vos.'},
+ {n:'Falta de información',cat:'Obstrucción · 6.1',pct:'46,8%',
+  cayo:()=>R.info===true,
+  si:'Nunca te dijeron con claridad si los precios eran en pesos o dólares: estaba en letra chica, recién en el último paso.',
+  no:'Abandonaste la compra antes de pagar sin tener toda la información.',
+  tip:'Antes de pagar, confirmá moneda, impuestos, plazos de entrega y política de devolución. Si no está, preguntá o no compres.'},
+ {n:'Contador de tiempo',cat:'Urgencia · 2.1',pct:'36,4%',
+  cayo:()=>R.timer!==false,
+  si:'Te pusieron un reloj de 10 minutos para usar el cupón. ¿Sabías que cuando llegaba a cero volvía a empezar? Era falso.',
+  no:'Elegiste usar el cupón "más tarde" y no te dejaste apurar por el reloj.',
+  tip:'Los relojes de cuenta regresiva casi siempre se reinician. Si una oferta sólo sirve con apuro, no es una buena oferta.'},
+ {n:'Costos escondidos',cat:'Furtivo · 1.2',pct:'33,8%',
+  cayo:()=>R.costos===true,
+  si:'El envío, una "gestión online" y un "embalaje sustentable" aparecieron recién en el último paso, cuando ya habías cargado tus datos.',
+  no:'Al ver los cargos nuevos en el último paso, cancelaste la compra.',
+  tip:'Buscá el total final, con envío y cargos, antes de empezar a cargar tus datos. Si aparecen costos al final, volvé atrás.'},
+ {n:'Mensajes de actividad',cat:'Prueba social · 4.1',pct:'19,5%',
+  cayo:()=>R.social===true,
+  si:'"23 personas están viendo esto ahora". El número se inventaba al azar y subía para que sintieras competencia.',
+  no:'No llegaste a agregar productos con estos mensajes en pantalla.',
+  tip:'No hay forma de verificar esos números. Que otros miren un producto no cambia si lo necesitás.'},
+ {n:'Testimonios dudosos',cat:'Prueba social · 4.2',pct:'14,3%',
+  cayo:()=>R.social===true,
+  si:'Las reseñas eran todas de 5 estrellas, firmadas por "Sofi", "M." o "Cliente verificada". No había forma de saber quién las escribió.',
+  no:'No compraste guiado por reseñas sin origen.',
+  tip:'Desconfiá de reseñas perfectas, sin nombre completo, sin fecha o sin fotos reales. Buscá opiniones fuera de la tienda.'},
+ {n:'Mensajes de poco stock',cat:'Escasez · 5.1',pct:'13%',
+  cayo:()=>R.social===true,
+  si:'"¡Últimas 2 unidades!" aparecía en todos los productos, siempre con el mismo número.',
+  no:'No te dejaste llevar por el "quedan pocas unidades".',
+  tip:'Si todos los productos dicen "últimas unidades", ninguno lo es. La escasez se usa para que no compares.'},
+ {n:'Mensajes de alta demanda',cat:'Escasez · 5.2',pct:'7,8%',
+  cayo:()=>R.social===true,
+  si:'"87 personas lo compraron en las últimas 24 h. Se está agotando". El mensaje era el mismo para todos los productos.',
+  no:'No te apuró el mensaje de "se está agotando".',
+  tip:'Que algo sea popular no lo hace urgente. Tomate el tiempo de comparar precios en otras tiendas.'},
+ {n:'Suscripciones escondidas',cat:'Furtivo · 1.3',pct:'1,3%',
+  cayo:()=>R.club===true,
+  si:'"Probá Club Glow GRATIS" venía marcado. En letra chica: después de 30 días te cobraban $ 490 por mes.',
+  no:'Destildaste la "prueba gratis" de Club Glow que se convertía en un cobro mensual.',
+  tip:'"Gratis" con renovación automática es un cobro futuro. Leé la letra chica y anotá cuándo vence la prueba.'},
+ {n:'Colarse en la cesta',cat:'Furtivo · 1.1',pct:'0%',dato:'No se detectaron casos en Uruguay en 2025, pero es común en otros países.',
+  cayo:()=>R.colado===true,
+  si:'Apareció un "Mini sérum iluminador" en tu carrito que nunca elegiste, y lo pagaste. Para quitarlo había que tocar un "quitar" casi invisible y aguantar un mensaje que te hacía sentir culpa.',
+  no:'Detectaste el producto que se coló en tu carrito y lo sacaste, aunque intentaron hacerte sentir culpa.',
+  tip:'Revisá el carrito línea por línea antes de pagar. Si algo "es para vos" pero tiene precio, no es un regalo.'}
+];
+function revelar(){
+  const res=PATRONES.map(p=>({...p,c:p.cayo()})); const n=res.filter(p=>p.c).length;
+  $('#rev-eyebrow').textContent=R.abandono?'Abandonaste la compra. Bien, pero…':'¡Compra realizada! O eso parecía…';
+  $('#rev-txt').textContent=n>=9?'Tranquilo: estas trampas están diseñadas por profesionales para que no las veas. Casi todas las tiendas uruguayas usan alguna.':
+    n>=5?'Esquivaste algunas, pero varias trampas lograron guiar tus decisiones sin que lo notaras.':'¡Muy bien! Detectaste la mayoría. Igual, mirá cómo funcionan para reconocerlas siempre.';
+  ir('s-final');
+  let k=0;const iv=setInterval(()=>{$('#rev-num').textContent=k;if(k>=n)clearInterval(iv);k++},90);
+  setTimeout(()=>$('#medidor').style.width=(n/12*100)+'%',200);
+  $('#lista').innerHTML=res.map((p,i)=>`<details class="pat ${p.c?'cayo':'esq'}"${i<2?' open':''}>
+    <summary><span class="nro">${i+1}</span><span class="nom">${p.n}<small>${p.cat}</small></span><span class="chip">${p.c?'Caíste':'Lo esquivaste'}</span></summary>
+    <div class="det"><p>${p.c?p.si:p.no}</p>
+      <div class="dato"><b>${p.pct}</b><span>${p.dato||'de las tiendas online uruguayas relevadas por UDECO usan este patrón.'}</span></div>
+      <div class="tip"><b>Cómo detectarlo:</b> ${p.tip}</div></div></details>`).join('');
+}
+pintarTienda();
+if(CANAL==='shopping'){ruletaPrimero=true;entrarTienda()}
+</script>
+</body>
+</html>
