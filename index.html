@@ -253,7 +253,7 @@ img{display:block;max-width:100%}
   <div class="hdr-fijo"><div class="top"><div class="burger" aria-hidden="true"><i></i><i></i><i></i></div></div><div class="ola ola-crema-abajo"></div></div>
   <div class="gancho grid">
     <h1 class="titulo no grad-gana" id="g-no">No hay cupón.</h1>
-    <p class="pero">Pero acabás de caer en una trampa que usan <mark>9 de cada 10</mark> tiendas online.</p>
+    <p class="pero">Pero acabás de caer en un patrón oscuro que usan <mark>9 de cada 10</mark> tiendas online.</p>
     <p class="pista" id="g-pista">Te prometimos un premio para que escanearas el QR. Las tiendas online hacen lo mismo todos los días, y casi nunca te das cuenta.</p>
     <p class="anim">¿Te animás a ver en cuántas más caés?</p>
     <button class="pill" onclick="entrarTienda()">Sí, quiero probar &gt;</button>
@@ -352,8 +352,8 @@ img{display:block;max-width:100%}
     <div class="paso"><i class="on"></i><i class="on" id="paso2"></i><i id="paso3"></i></div>
     <div id="co-1">
       <h1>Envío</h1>
-      <div class="campo"><input class="input" id="co-nombre" placeholder="Nombre y apellido"></div>
-      <div class="campo"><input class="input" placeholder="Dirección"></div>
+      <div class="campo"><input class="input" id="co-nombre" placeholder="Nombre y apellido" value="Sofía Pereira"></div>
+      <div class="campo"><input class="input" placeholder="Dirección" value="Av. 18 de Julio 1234, apto 5"></div>
       <div class="campo"><input class="input" placeholder="Departamento" value="Montevideo"></div>
       <div class="club" onclick="toggleClub()">
         <span class="chk on" id="club-chk"></span>
@@ -364,8 +364,8 @@ img{display:block;max-width:100%}
     </div>
     <div id="co-2" style="display:none">
       <h1>Pago</h1>
-      <div class="campo"><input class="input" placeholder="Número de tarjeta" inputmode="numeric"></div>
-      <div class="fila"><input class="input" placeholder="MM/AA"><input class="input" placeholder="CVV"></div>
+      <div class="campo"><input class="input" placeholder="Número de tarjeta" inputmode="numeric" value="4111 1111 1111 1111"></div>
+      <div class="fila"><input class="input" placeholder="MM/AA" value="08/29"><input class="input" placeholder="CVV" value="123"></div>
       <div class="resumen" id="res-co2"></div>
       <button class="pill" onclick="pagar()">Pagar ahora</button>
       <button class="volver" style="display:block;margin:10px auto 0;color:#888" onclick="abandonar()">Cancelar compra</button>
@@ -420,10 +420,10 @@ img{display:block;max-width:100%}
     <h2 class="titulo grad-negro" id="reg-t">Ingresá tus datos para continuar</h2>
     <p class="txt">Sumate a glowy y desbloqueá un regalo sorpresa en tu primera compra 🎁</p>
     <form onsubmit="enviarRegistro(event)" novalidate>
-      <input class="input" id="reg-email" type="email" placeholder="Email">
+      <input class="input" id="reg-email" type="email" placeholder="Email" value="sofia.pereira@gmail.com">
       <div class="fila">
-        <label class="input tel" style="flex:1.1"><span>UY +598</span><input placeholder="Celular" inputmode="tel" id="reg-cel"></label>
-        <input class="input" style="flex:1" placeholder="Nombre" id="reg-nombre">
+        <label class="input tel" style="flex:1.35"><span>UY +598</span><input placeholder="Celular" inputmode="tel" id="reg-cel" value="99123456"></label>
+        <input class="input" style="flex:1" placeholder="Nombre" id="reg-nombre" value="Sofía">
       </div>
       <div class="consent" onclick="toggleConsent()"><span class="chk on" id="consent-chk"></span><span>Al dar tu información, das consentimiento para que tu información sea guardada y compartida con socios comerciales de acuerdo a nuestra <u>política de privacidad</u>.</span></div>
       <button class="pill" type="submit">Continuar &gt;</button>
@@ -516,7 +516,7 @@ function toggleConsent(){consent=!consent;$('#consent-chk').classList.toggle('on
 function enviarRegistro(e){
   e.preventDefault();
   R.registro=true; R.consent=consent; R.visual=true;
-  const n=$('#reg-nombre').value.trim(); if(n)$('#co-nombre').value=n;
+  
   cerrarRegistro(false);
 }
 function cerrarRegistro(salteo){
