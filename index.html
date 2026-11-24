@@ -317,7 +317,7 @@ img{display:block;max-width:100%}
     <div class="lbl">Tamaño</div>
     <div class="tamanos" id="tamanos"></div>
     <div class="combo" onclick="toggleCombo()">
-      <img src="img/labial.jpg" alt="">
+      <img src="img/labial.jpg?v=2" alt="">
       <div><b>Completá tu rutina</b>Sumá el bálsamo labial Glow por solo <span id="combo-p"></span> más</div>
       <span class="chk on" id="combo-chk"></span>
     </div>
@@ -475,7 +475,7 @@ const PRODUCTOS=[
   {id:'crema',nom:'Crema Hidratante Glow',img:'img/crema.jpg',precio:1290,tag:'Más vendido'},
   {id:'compacto',nom:'Polvo Compacto Soft Matte',img:'img/compacto.jpg',precio:990,tag:'-40%'},
   {id:'pote',nom:'Mascarilla Nocturna Lilac',img:'img/pote.jpg',precio:1150,tag:'¡Últimas!'},
-  {id:'labial',nom:'Labial Rosé Velvet',img:'img/labial.jpg',precio:690,tag:'Nuevo'}
+  {id:'labial',nom:'Labial Rosé Velvet',img:'img/labial.jpg?v=2',precio:690,tag:'Nuevo'}
 ];
 const TAMANOS=[{n:'30 ml',f:.6},{n:'50 ml',f:1},{n:'100 ml',f:1.7,pop:'⭐ Más elegido'}];
 const COMBO=390, COLADO={nom:'Mini sérum iluminador',img:'img/cosmeticos.jpg',precio:420};
@@ -573,7 +573,7 @@ function toggleCombo(){combo=!combo;$('#combo-chk').classList.toggle('on',combo)
 function agregar(){
   R.presion=(tam===2)||combo; R.social=true;
   carrito.push({nom:prod.nom+' · '+TAMANOS[tam].n,img:prod.img,precio:precioActual()});
-  if(combo)carrito.push({nom:'Bálsamo labial Glow',img:'img/labial.jpg',precio:COMBO});
+  if(combo)carrito.push({nom:'Bálsamo labial Glow',img:'img/labial.jpg?v=2',precio:COMBO});
   clearInterval(viendoInt); actualizarCnt(); irCarrito();
 }
 function actualizarCnt(){const n=carrito.length+(carrito.length&&colado?1:0);$$('.cnt').forEach(c=>c.textContent=n)}
