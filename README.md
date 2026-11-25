@@ -8,7 +8,7 @@ La persona entra a una tienda simulada, cae (o no) en los 12 patrones oscuros re
 
 Agregá al link la terminación del canal:
 
-- `#cantina`: afiches en facultades
+- `#cantina`: afiches de "maquillaje gratis" (el nombre del canal quedó así porque ya está en los QR impresos)
 - `#trago`: stickers en bares
 - `#meta`: anuncios en Instagram/Facebook
 - `#shopping`: vallas en shoppings (abre directo la ruleta)
