@@ -472,13 +472,13 @@ img{display:block;max-width:100%}
 <script>
 /* ---------- Datos ---------- */
 const PRODUCTOS=[
-  {id:'crema',nom:'Crema Hidratante Glow',img:'img/crema.jpg',precio:1290,tag:'Más vendido'},
-  {id:'compacto',nom:'Polvo Compacto Soft Matte',img:'img/compacto.jpg',precio:990,tag:'-40%'},
+  {id:'paleta',nom:'Paleta de Sombras Nude Rosé',img:'img/paleta.jpg',precio:1290,tag:'Más vendido',tams:[{n:'6 tonos',f:.6},{n:'9 tonos',f:1},{n:'12 tonos',f:1.7,pop:'⭐ Más elegido'}]},
+  {id:'gloss',nom:'Gloss Sparkle Pink',img:'img/gloss.jpg',precio:990,tag:'-40%'},
   {id:'pote',nom:'Mascarilla Nocturna Lilac',img:'img/pote.jpg',precio:1150,tag:'¡Últimas!'},
   {id:'labial',nom:'Labial Rosé Velvet',img:'img/labial.jpg?v=2',precio:690,tag:'Nuevo'}
 ];
 const TAMANOS=[{n:'30 ml',f:.6},{n:'50 ml',f:1},{n:'100 ml',f:1.7,pop:'⭐ Más elegido'}];
-const COMBO=390, COLADO={nom:'Mini sérum iluminador',img:'img/cosmeticos.jpg',precio:420};
+const COMBO=390, COLADO={nom:'Mini sérum iluminador',img:'img/serum.jpg',precio:420};
 const CARGOS=[['Envío',290],['Gestión online',149],['Embalaje sustentable',99]];
 
 /* Lo que hizo la persona: true = cayó, false = lo esquivó */
@@ -562,9 +562,10 @@ function verProducto(id){
   clearInterval(viendoInt); let v=19+Math.floor(Math.random()*9); $('#viendo').textContent=v;
   viendoInt=setInterval(()=>{v+=Math.random()<.6?1:-1;$('#viendo').textContent=v},2500);
 }
-function precioActual(){return prod.precio*TAMANOS[tam].f}
+function tams(){return prod.tams||TAMANOS}
+function precioActual(){return prod.precio*tams()[tam].f}
 function pintarTamanos(){
-  $('#tamanos').innerHTML=TAMANOS.map((t,i)=>`<button class="tam ${i===tam?'sel':''}" onclick="elegirTam(${i})">${t.pop?`<span class="pop">${t.pop}</span>`:''}${t.n}<small>${fmt(prod.precio*t.f)}</small></button>`).join('');
+  $('#tamanos').innerHTML=tams().map((t,i)=>`<button class="tam ${i===tam?'sel':''}" onclick="elegirTam(${i})">${t.pop?`<span class="pop">${t.pop}</span>`:''}${t.n}<small>${fmt(prod.precio*t.f)}</small></button>`).join('');
   $('#p-precio').textContent=fmt(precioActual()); $('#p-antes').textContent=fmt(precioActual()/.6);
   $('#btn-total').textContent=fmt(precioActual()+(combo?COMBO:0));
 }
@@ -572,7 +573,7 @@ function elegirTam(i){tam=i;pintarTamanos()}
 function toggleCombo(){combo=!combo;$('#combo-chk').classList.toggle('on',combo);pintarTamanos()}
 function agregar(){
   R.presion=(tam===2)||combo; R.social=true;
-  carrito.push({nom:prod.nom+' · '+TAMANOS[tam].n,img:prod.img,precio:precioActual()});
+  carrito.push({nom:prod.nom+' · '+tams()[tam].n,img:prod.img,precio:precioActual()});
   if(combo)carrito.push({nom:'Bálsamo labial Glow',img:'img/labial.jpg?v=2',precio:COMBO});
   clearInterval(viendoInt); actualizarCnt(); irCarrito();
 }
